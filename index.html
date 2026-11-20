@@ -89,5 +89,77 @@ function decline() {
     "No problem! Thanks for visiting. Goodbye! 👋";
 }
 </script>
+  
+<div style="padding:20px;text-align:center;">
+  <h3>Share Your Location</h3>
+
+  <p>
+    If you agree, your current location will be
+    sent to the website owner through Telegram.
+  </p>
+
+  <label>
+    <input type="checkbox" id="consent">
+    I agree to share my location.
+  </label>
+
+  <br><br>
+
+  <button onclick="shareLocation()">
+    Share My Location
+  </button>
+
+  <p id="status"></p>
+</div>
+
+<script>
+async function shareLocation() {
+  const status = document.getElementById("status");
+
+  if (!document.getElementById("consent").checked) {
+    status.innerText = "Please agree before sharing.";
+    return;
+  }
+
+  if (!navigator.geolocation) {
+    status.innerText = "Location is not supported.";
+    return;
+  }
+
+  status.innerText = "Waiting for location permission...";
+
+  navigator.geolocation.getCurrentPosition(async function(pos) {
+    status.innerText = "Submitting your location...";
+
+    const data = {
+      consent: true,
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      pageUrl: location.href
+    };
+
+    try {
+      await fetch("PASTE_YOUR_WEB_APP_URL_HERE", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify(data)
+      });
+
+      status.innerText =
+        "Request submitted. Thank you for sharing!";
+
+    } catch (error) {
+      status.innerText = "Could not submit. Please try again.";
+    }
+
+  }, function() {
+    status.innerText = "Location permission was not granted.";
+  });
+}
+</script>
+  
 </body>
 </html>
